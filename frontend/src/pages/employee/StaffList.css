@@ -1,0 +1,597 @@
+.staff-list {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* ── Header ── */
+.page-header {
+    margin-bottom: 24px;
+}
+
+.page-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.subtitle {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* ── Filters ── */
+.filter-section {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.search-box {
+    flex: 1;
+    min-width: 220px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 10px 36px 10px 36px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+.search-clear {
+    position: absolute;
+    right: 10px;
+    background: #e5e7eb;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    font-size: 10px;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.search-clear:hover {
+    background: #d1d5db;
+}
+
+.filter-box {
+    min-width: 180px;
+}
+
+.filter-box select {
+    width: 100%;
+    padding: 10px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    color: #374151;
+}
+
+.filter-box select:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+.clear-all-btn {
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 13px;
+    color: #6b7280;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+}
+
+.clear-all-btn:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #dc2626;
+}
+
+/* ── Filter chips ── */
+.filter-chips {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8;
+    border-radius: 20px;
+    padding: 4px 10px 4px 12px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.chip button {
+    background: #bfdbfe;
+    border: none;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    font-size: 9px;
+    color: #1d4ed8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.chip button:hover {
+    background: #93c5fd;
+}
+
+/* ── Staff Grid ── */
+.staff-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+/* ── Staff Card ── */
+.staff-card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f0f0f0;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.staff-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.staff-card-hr {
+    border-top: 3px solid #7c3aed;
+}
+
+/* HR ribbon */
+.hr-ribbon {
+    position: absolute;
+    top: 10px;
+    right: -8px;
+    background: #7c3aed;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 14px 3px 10px;
+    border-radius: 4px 0 0 4px;
+    letter-spacing: 0.08em;
+}
+
+/* ── Avatar ── */
+.staff-avatar {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+}
+
+.staff-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+}
+
+.avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+/* ── Staff Info ── */
+.staff-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.staff-info h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 28px;
+}
+
+/* Role badge */
+.role-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.role-badge-hr {
+    background: #ede9fe;
+    color: #6d28d9;
+    border: 1px solid #ddd6fe;
+}
+
+.role-badge-emp {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+/* Meta info rows */
+.staff-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.staff-meta p {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.staff-meta p span {
+    flex-shrink: 0;
+    font-size: 13px;
+}
+
+.staff-id {
+    color: #9ca3af !important;
+    font-size: 11px !important;
+}
+
+.staff-department {
+    color: #1e3c72 !important;
+    font-weight: 500;
+}
+
+.staff-jobtitle {
+    color: #374151 !important;
+}
+
+.staff-phone {
+    color: #2563eb !important;
+}
+
+.staff-email {
+    color: #6b7280 !important;
+    font-size: 11px !important;
+}
+
+/* ── HR Rating stars ── */
+.staff-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.stars-row {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+}
+
+.star {
+    font-size: 14px;
+    line-height: 1;
+    transition: transform 0.1s;
+}
+
+.star.filled {
+    color: #f59e0b;
+}
+
+.star.empty {
+    color: #d1d5db;
+}
+
+.rating-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+/* ── No results ── */
+.no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: #9ca3af;
+}
+
+.no-results-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+}
+
+.no-results p {
+    font-size: 16px;
+    font-weight: 500;
+    color: #6b7280;
+    margin: 0 0 6px;
+}
+
+.no-results span {
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+/* ── Loading ── */
+.loading {
+    text-align: center;
+    padding: 60px;
+    font-size: 16px;
+    color: #6b7280;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .staff-list {
+        padding: 16px;
+    }
+
+    .page-header h1 {
+        font-size: 22px;
+    }
+
+    .filter-section {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .search-box,
+    .filter-box {
+        min-width: unset;
+        width: 100%;
+    }
+
+    .clear-all-btn {
+        width: 100%;
+    }
+
+    .staff-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .staff-list {
+        padding: 12px;
+    }
+
+    .staff-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .staff-card {
+        padding: 16px;
+    }
+
+    .staff-avatar {
+        width: 52px;
+        height: 52px;
+    }
+
+    .staff-info h3 {
+        font-size: 14px;
+    }
+}
+
+/* ── View Reviews Button ── */
+.btn-view-reviews {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 8px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    width: 100%;
+    justify-content: center;
+}
+.btn-view-reviews:hover {
+    background: #dbeafe;
+    border-color: #93c5fd;
+}
+
+/* ── Staff List Reviews Modal ── */
+.sl-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 16px;
+}
+
+.sl-modal {
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.sl-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px 20px 0;
+    flex-shrink: 0;
+}
+
+.sl-modal-header h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 3px;
+}
+
+.sl-modal-sub {
+    font-size: 12px;
+    color: #9ca3af;
+    margin: 0;
+}
+
+.sl-modal-close {
+    background: #f3f4f6;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+.sl-modal-close:hover { background: #e5e7eb; }
+
+.sl-reviews-list {
+    overflow-y: auto;
+    padding: 16px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sl-review-card {
+    background: #f9fafb;
+    border-radius: 10px;
+    padding: 12px 14px;
+    border: 1px solid #f0f0f0;
+}
+
+.sl-review-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.sl-review-stars {
+    display: flex;
+    gap: 1px;
+}
+
+.sl-review-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.sl-review-date {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-left: auto;
+}
+
+.sl-review-reviewer {
+    font-size: 11px;
+    color: #6b7280;
+    margin: 0 0 4px;
+}
+
+.sl-review-feedback {
+    font-size: 13px;
+    color: #374151;
+    margin: 0 0 4px;
+    line-height: 1.5;
+}
+
+.sl-review-goals {
+    font-size: 12px;
+    color: #7c3aed;
+    margin: 0;
+    font-style: italic;
+}

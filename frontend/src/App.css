@@ -1,0 +1,73 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #f3f4f6;
+}
+
+.app {
+    min-height: 100vh;
+}
+
+.app-body {
+    display: flex;
+    margin-top: 60px;
+    min-height: calc(100vh - 60px);
+}
+
+.app-content {
+    flex: 1;
+    margin-left: 250px;
+    padding: 24px;
+    min-height: calc(100vh - 60px);
+    width: calc(100% - 250px);
+    max-width: calc(100% - 250px);
+    overflow-x: hidden;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .app-content {
+        margin-left: 220px;
+        padding: 20px;
+        width: calc(100% - 220px);
+        max-width: calc(100% - 220px);
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .sidebar {
+        display: none !important;
+    }
+    
+    .app-content {
+        margin-left: 0;
+        padding: 16px;
+        padding-bottom: 80px;
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* Mobile Small */
+@media (max-width: 480px) {
+    .app-content {
+        padding: 10px;
+        padding-bottom: 80px;
+    }
+}
+
+@media (min-width: 769px) {
+    .mobile-nav-container {
+        display: none !important;
+    }
+}
