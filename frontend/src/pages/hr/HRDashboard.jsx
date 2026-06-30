@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import api from '../../services/api';
+import React, { useState } from 'react';
+import api, { fetcher } from '../../services/api';
+import useSWR from 'swr';
 import './HRDashboard.css';
 
 const buildImageUrl = (path) => {
@@ -10,11 +11,13 @@ const buildImageUrl = (path) => {
 };
 
 const HRDashboard = () => {
-    const [employees, setEmployees] = useState([]);
-    const [events, setEvents] = useState([]);
-    const [promotions, setPromotions] = useState([]);
-    const [employeeOfYear, setEmployeeOfYear] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const { data: employees = [], isLoading: loadingEmployees } = useSWR('/employees/', fetcher, { refreshInterval: 10000 });
+    const { data: events = [], isLoading: loadingEvents } = useSWR('/hr-dashboard/events/', fetcher, { refreshInterval: 10000 });
+    const { data: promotions = [], isLoading: loadingPromotions } = useSWR('/hr-dashboard/promotions/', fetcher, { refreshInterval: 10000 });
+    const currentYear = new Date().getFullYear();
+    const { data: eoyList = [], isLoading: loadingEoy } = useSWR(`/hr-dashboard/eoy/?year=${currentYear}`, fetcher, { refreshInterval: 10000 });
+    const employeeOfYear = eoyList.length > 0 ? eoyList[0] : null;
+    const loading = loadingEmployees || loadingEvents || loadingPromotions || loadingEoy;
     const [showEventForm, setShowEventForm] = useState(false);
     const [showEOYForm, setShowEOYForm] = useState(false);
     const [showPromotionForm, setShowPromotionForm] = useState(false);
@@ -23,40 +26,7 @@ const HRDashboard = () => {
     const [eoyData, setEOYData] = useState({ employee: '', reason: '' });
     const [promotionData, setPromotionData] = useState({ employee: '', from: '', to: '', date: '' });
 
-    useEffect(() => {
-        fetchData();
-        const interval = setInterval(() => fetchData(), 10000);
-        return () => clearInterval(interval);
-    }, []);
-
-    const fetchData = async () => {
-        try {
-            const empRes = await api.get('/employees/');
-            const employeeList = empRes.data;
-            setEmployees(employeeList);
-
-            const eventsRes = await api.get('/hr-dashboard/events/');
-            setEvents(eventsRes.data);
-
-            const promRes = await api.get('/hr-dashboard/promotions/');
-            setPromotions(promRes.data);
-
-            const currentYear = new Date().getFullYear();
-            const eoyRes = await api.get(`/hr-dashboard/eoy/?year=${currentYear}`);
-
-            // Debug — remove after confirming
-            console.log('Employees:', employeeList);
-            console.log('EOY data:', eoyRes.data);
-            console.log('Promotions:', promRes.data);
-            console.log('Events:', eventsRes.data);
-
-            if (eoyRes.data.length > 0) setEmployeeOfYear(eoyRes.data[0]);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    // Replaced with SWR hook above
 
     // Match EOY employee by id or user id (handles both API shapes)
     const getEOYEmployee = () => {
@@ -99,7 +69,6 @@ const HRDashboard = () => {
             setShowEventForm(false);
             setNewEvent({ title: '', date: '', description: '', image: null });
             setImagePreview(null);
-            fetchData();
         } catch (error) {
             console.error('Error:', error);
             alert('Error adding event');
@@ -116,7 +85,6 @@ const HRDashboard = () => {
             });
             setShowEOYForm(false);
             setEOYData({ employee: '', reason: '' });
-            fetchData();
         } catch (error) {
             console.error('Error:', error);
             alert('Error selecting Employee of the Year');
@@ -134,7 +102,6 @@ const HRDashboard = () => {
             });
             setShowPromotionForm(false);
             setPromotionData({ employee: '', from: '', to: '', date: '' });
-            fetchData();
         } catch (error) {
             console.error('Error:', error);
             alert('Error adding promotion');
@@ -143,14 +110,14 @@ const HRDashboard = () => {
 
     const deleteEvent = async (id) => {
         if (window.confirm('Delete this event?')) {
-            try { await api.delete(`/hr-dashboard/events/${id}/`); fetchData(); }
+            try { await api.delete(`/hr-dashboard/events/${id}/`); }
             catch (error) { alert('Error deleting event'); }
         }
     };
 
     const deletePromotion = async (id) => {
         if (window.confirm('Delete this promotion?')) {
-            try { await api.delete(`/hr-dashboard/promotions/${id}/`); fetchData(); }
+            try { await api.delete(`/hr-dashboard/promotions/${id}/`); }
             catch (error) { alert('Error deleting promotion'); }
         }
     };

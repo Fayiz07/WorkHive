@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import api from '../../services/api';
+import React, { useState } from 'react';
+import api, { fetcher } from '../../services/api';
+import useSWR from 'swr';
 import './StaffList.css';
 
 const buildImageUrl = (path) => {
@@ -10,37 +11,15 @@ const buildImageUrl = (path) => {
 };
 
 const StaffList = () => {
-    const [employees, setEmployees] = useState([]);
-    const [performances, setPerformances] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const { data: employees = [], isLoading: loadingEmployees } = useSWR('/employees/', fetcher, { refreshInterval: 10000 });
+    const { data: performances = [], isLoading: loadingPerformances } = useSWR('/performance/', fetcher, { refreshInterval: 10000 });
+    const loading = loadingEmployees || loadingPerformances;
     const [search, setSearch] = useState('');
     const [selectedDepartment, setSelectedDepartment] = useState('');
     const [selectedRole, setSelectedRole] = useState('');
-    const [departments, setDepartments] = useState([]);
-    const [reviewsModal, setReviewsModal] = useState(null); // { name, reviews[] }
-
-    useEffect(() => {
-        fetchEmployees();
-        const interval = setInterval(() => fetchEmployees(), 10000);
-        return () => clearInterval(interval);
-    }, []);
-
-    const fetchEmployees = async () => {
-        try {
-            const [empRes, perfRes] = await Promise.all([
-                api.get('/employees/'),
-                api.get('/performance/')
-            ]);
-            setEmployees(empRes.data);
-            setPerformances(perfRes.data);
-            const deptList = [...new Set(empRes.data.map(emp => emp.department).filter(Boolean))];
-            setDepartments(deptList);
-        } catch (error) {
-            console.error('Error:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const [reviewsModal, setReviewsModal] = useState(null);
+    // Fetched via SWR
+    const departments = [...new Set(employees.map(emp => emp.department).filter(Boolean))];
 
     // Get the latest performance rating for a given employee (matched by user id)
     const getEmployeeRating = (userID) => {

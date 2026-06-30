@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useAuth } from '../../context/AuthContext';
-import api from '../../services/api';
+import { fetcher } from '../../services/api';
+import useSWR from 'swr';
 import './EmployeeDashboard.css';
 
 const buildImageUrl = (path) => {
@@ -12,36 +13,13 @@ const buildImageUrl = (path) => {
 
 const EmployeeDashboard = () => {
     const { user } = useAuth();
-    const [events, setEvents] = useState([]);
-    const [promotions, setPromotions] = useState([]);
-    const [employeeOfYear, setEmployeeOfYear] = useState(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetchData();
-        const interval = setInterval(() => fetchData(), 10000);
-        return () => clearInterval(interval);
-    }, []);
-
-    const fetchData = async () => {
-        try {
-            const eventsRes = await api.get('/hr-dashboard/events/');
-            setEvents(eventsRes.data);
-
-            const promRes = await api.get('/hr-dashboard/promotions/');
-            setPromotions(promRes.data);
-
-            const currentYear = new Date().getFullYear();
-            const eoyRes = await api.get(`/hr-dashboard/eoy/?year=${currentYear}`);
-            if (eoyRes.data.length > 0) {
-                setEmployeeOfYear(eoyRes.data[0]);
-            }
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const { data: events = [], isLoading: loadingEvents } = useSWR('/hr-dashboard/events/', fetcher, { refreshInterval: 10000 });
+    const { data: promotions = [], isLoading: loadingPromotions } = useSWR('/hr-dashboard/promotions/', fetcher, { refreshInterval: 10000 });
+    const currentYear = new Date().getFullYear();
+    const { data: eoyData = [], isLoading: loadingEoy } = useSWR(`/hr-dashboard/eoy/?year=${currentYear}`, fetcher, { refreshInterval: 10000 });
+    
+    const employeeOfYear = eoyData.length > 0 ? eoyData[0] : null;
+    const loading = loadingEvents || loadingPromotions || loadingEoy;
 
     if (loading) {
         return <div className="loading">Loading...</div>;

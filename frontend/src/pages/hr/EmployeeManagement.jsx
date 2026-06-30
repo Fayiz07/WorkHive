@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import api from '../../services/api';
+import React, { useState } from 'react';
+import api, { fetcher } from '../../services/api';
+import useSWR, { mutate } from 'swr';
 import './EmployeeManagement.css';
 
 const EmployeeManagement = () => {
-    const [employees, setEmployees] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const { data: employees = [], isLoading: loading } = useSWR('/employees/', fetcher, { refreshInterval: 10000 });
     const [search, setSearch] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState(null);
@@ -14,22 +14,7 @@ const EmployeeManagement = () => {
         date_of_joining: '', salary: ''
     });
 
-    useEffect(() => {
-        fetchEmployees();
-        const interval = setInterval(() => fetchEmployees(), 10000);
-        return () => clearInterval(interval);
-    }, []);
-
-    const fetchEmployees = async () => {
-        try {
-            const response = await api.get('/employees/');
-            setEmployees(response.data);
-        } catch (error) {
-            console.error('Error:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    // Fetched via SWR
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -73,7 +58,7 @@ const EmployeeManagement = () => {
             setShowModal(false);
             setEditingEmployee(null);
             setFormData({ username: '', email: '', password: '', first_name: '', last_name: '', role: 'employee', employee_id: '', department: '', job_title: '', date_of_joining: '', salary: '' });
-            fetchEmployees();
+            mutate('/employees/');
             alert('Employee saved successfully!');
         } catch (error) {
             console.error('Error:', error);
@@ -103,7 +88,7 @@ const EmployeeManagement = () => {
         if (window.confirm('Are you sure you want to delete this employee?')) {
             try {
                 await api.delete(`/employees/${id}/`);
-                fetchEmployees();
+                mutate('/employees/');
             } catch (error) {
                 console.error('Error:', error);
                 alert('Error deleting employee');

@@ -1,42 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import api from '../../services/api';
+import { fetcher } from '../../services/api';
+import useSWR from 'swr';
 import './HRHome.css';
 
 const HRHome = () => {
     const { user } = useAuth();
-    const [stats, setStats] = useState({ totalEmployees: 0, pendingLeaves: 0, pendingAttendance: 0, totalPayroll: 0 });
-    const [leaveToday, setLeaveToday] = useState([]);
-    const [allPayrolls, setAllPayrolls] = useState([]);
+    const { data: employees = [] } = useSWR('/employees/', fetcher, { refreshInterval: 10000 });
+    const { data: leaves = [] } = useSWR('/leave/', fetcher, { refreshInterval: 10000 });
+    const { data: attendance = [] } = useSWR('/attendance/pending/', fetcher, { refreshInterval: 10000 });
+    const { data: allPayrolls = [] } = useSWR('/payroll/', fetcher, { refreshInterval: 10000 });
     const [selectedPayrollMonth, setSelectedPayrollMonth] = useState('All');
-
-    useEffect(() => {
-        fetchData();
-        const interval = setInterval(() => {
-            fetchData();
-        }, 10000); // Poll every 10 seconds
-        return () => clearInterval(interval);
-    }, []);
-
-    const fetchData = async () => {
-        try {
-            const employees = await api.get('/employees/');
-            const leaves = await api.get('/leave/');
-            const attendance = await api.get('/attendance/pending/');
-            const payroll = await api.get('/payroll/');
-            
-            const today = new Date().toISOString().split('T')[0];
-            const onLeave = leaves.data.filter(l => l.status === 'approved' && l.start_date <= today && l.end_date >= today);
-            const uniqueLeaveToday = Array.from(new Map(onLeave.map(l => [l.employee, l])).values());
-            setLeaveToday(uniqueLeaveToday);
-            setStats({
-                totalEmployees: employees.data.length,
-                pendingLeaves: leaves.data.filter(l => l.status === 'pending').length,
-                pendingAttendance: attendance.data.length,
-                totalPayroll: 0
-            });
-            setAllPayrolls(payroll.data);
-        } catch (error) { console.error('Error:', error); }
+    
+    const today = new Date().toISOString().split('T')[0];
+    const onLeave = leaves.filter(l => l.status === 'approved' && l.start_date <= today && l.end_date >= today);
+    const leaveToday = Array.from(new Map(onLeave.map(l => [l.employee, l])).values());
+    
+    const stats = {
+        totalEmployees: employees.length,
+        pendingLeaves: leaves.filter(l => l.status === 'pending').length,
+        pendingAttendance: attendance.length,
+        totalPayroll: 0
     };
 
     const uniqueMonths = [...new Set(allPayrolls.map(p => p.month).filter(Boolean))];

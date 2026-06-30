@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import api from '../../services/api';
+import React, { useState } from 'react';
+import api, { fetcher } from '../../services/api';
+import useSWR, { mutate } from 'swr';
 import './AttendancePage.css';
 
 const AttendancePage = () => {
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [attendances, setAttendances] = useState([]);
-    const [leaves, setLeaves] = useState([]);
+    const { data: attendances = [] } = useSWR('/attendance/my_requests/', fetcher, { refreshInterval: 10000 });
+    const { data: leaves = [] } = useSWR('/leave/my/', fetcher, { refreshInterval: 10000 });
     const [showLeaveForm, setShowLeaveForm] = useState(false);
     const [message, setMessage] = useState({ text: '', type: '' });
     const getLocalDateStr = () => {
@@ -17,20 +18,7 @@ const AttendancePage = () => {
     const [showAttendanceForm, setShowAttendanceForm] = useState(false);
     const [leaveError, setLeaveError] = useState('');
 
-    useEffect(() => {
-        fetchData();
-        const interval = setInterval(() => fetchData(), 10000);
-        return () => clearInterval(interval);
-    }, []);
-
-    const fetchData = async () => {
-        try {
-            const attendanceRes = await api.get('/attendance/my_requests/');
-            const leavesRes = await api.get('/leave/my/');
-            setAttendances(attendanceRes.data);
-            setLeaves(leavesRes.data);
-        } catch (error) { console.error('Error:', error); }
-    };
+    // Fetched via SWR
 
     const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
     const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
@@ -88,7 +76,7 @@ const AttendancePage = () => {
             setShowLeaveForm(false);
             setLeaveError('');
             setLeaveForm({ leave_type: 'casual', start_date: '', end_date: '', reason: '' });
-            fetchData();
+            mutate('/leave/my/');
             setTimeout(() => setMessage({ text: '', type: '' }), 3000);
         } catch (error) { 
             console.error('Error:', error.response?.data);
@@ -103,7 +91,7 @@ const AttendancePage = () => {
             setMessage({ text: 'Attendance request submitted successfully!', type: 'success' });
             setShowAttendanceForm(false);
             setAttendanceForm({ date: getLocalDateStr(), check_in_time: '09:00', check_out_time: '17:00', notes: '' });
-            fetchData();
+            mutate('/attendance/my_requests/');
             setTimeout(() => setMessage({ text: '', type: '' }), 3000);
         } catch (error) { setMessage({ text: 'Error submitting attendance request', type: 'error' }); }
     };

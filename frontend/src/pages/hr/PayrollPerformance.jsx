@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import api from '../../services/api';
+import React, { useState } from 'react';
+import api, { fetcher } from '../../services/api';
+import useSWR, { mutate } from 'swr';
 import './PayrollPerformance.css';
 
 const PayrollPerformance = () => {
     const [activeTab, setActiveTab] = useState('payroll');
-    const [employees, setEmployees] = useState([]);
-    const [payrolls, setPayrolls] = useState([]);
-    const [performances, setPerformances] = useState([]);
+    const { data: employees = [], isLoading: loadingEmployees } = useSWR('/employees/', fetcher, { refreshInterval: 10000 });
+    const { data: payrolls = [], isLoading: loadingPayrolls } = useSWR('/payroll/', fetcher, { refreshInterval: 10000 });
+    const { data: performances = [], isLoading: loadingPerformances } = useSWR('/performance/', fetcher, { refreshInterval: 10000 });
+    
+    const departments = [...new Set(employees.map(emp => emp.department).filter(Boolean))];
+    const loading = loadingEmployees || loadingPayrolls || loadingPerformances;
     const [showPayrollModal, setShowPayrollModal] = useState(false);
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [showProgressModal, setShowProgressModal] = useState(false);
@@ -16,38 +20,7 @@ const PayrollPerformance = () => {
     const [reviewForm, setReviewForm] = useState({ rating: 3, feedback: '', goals: '' });
     const [payrollDepartmentFilter, setPayrollDepartmentFilter] = useState('');
     const [performanceDepartmentFilter, setPerformanceDepartmentFilter] = useState('');
-    const [departments, setDepartments] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetchData();
-        const interval = setInterval(() => fetchData(), 10000);
-        return () => clearInterval(interval);
-    }, []);
-
-    const fetchData = async () => {
-        try {
-            const empRes = await api.get('/employees/');
-            const payrollRes = await api.get('/payroll/');
-            const perfRes = await api.get('/performance/');
-            
-            console.log('Employees:', empRes.data);
-            console.log('Payroll:', payrollRes.data);
-            console.log('Performance:', perfRes.data);
-            
-            setEmployees(empRes.data);
-            setPayrolls(payrollRes.data);
-            setPerformances(perfRes.data);
-            
-            const deptList = [...new Set(empRes.data.map(emp => emp.department).filter(Boolean))];
-            setDepartments(deptList);
-            
-        } catch (error) {
-            console.error('Error:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    // Fetched via SWR
 
     const getEmployeeInfo = (userId) => {
         const emp = employees.find(e => e.user === userId);
@@ -85,7 +58,7 @@ const PayrollPerformance = () => {
             await api.post('/payroll/', data);
             setShowPayrollModal(false);
             setPayrollForm({ month: '', basic_salary: '', deductions: 0, bonuses: 0 });
-            fetchData();
+            mutate('/payroll/');
             alert('Salary slip generated successfully!');
         } catch (error) {
             console.error('Error:', error.response?.data || error.message);
@@ -108,7 +81,7 @@ const PayrollPerformance = () => {
             });
             setShowReviewModal(false);
             setReviewForm({ rating: 3, feedback: '', goals: '' });
-            fetchData();
+            mutate('/payroll/');
             alert('Review submitted successfully');
         } catch (error) {
             console.error('Error:', error);
@@ -119,7 +92,7 @@ const PayrollPerformance = () => {
     const markAsPaid = async (id) => {
         try {
             await api.patch(`/payroll/${id}/`, { is_paid: true });
-            fetchData();
+            mutate('/payroll/');
             alert('Salary marked as paid');
         } catch (error) {
             console.error('Error:', error);

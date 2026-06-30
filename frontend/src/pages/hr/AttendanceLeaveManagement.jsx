@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import api from '../../services/api';
+import React, { useState } from 'react';
+import api, { fetcher } from '../../services/api';
+import useSWR, { mutate } from 'swr';
 import './AttendanceLeaveManagement.css';
 import '../employee/StaffList.css';
 
@@ -12,11 +13,12 @@ const buildImageUrl = (path) => {
 
 const AttendanceLeaveManagement = () => {
     const [activeTab, setActiveTab] = useState('leaves');
-    const [leaves, setLeaves] = useState([]);
-    const [attendances, setAttendances] = useState([]);
-    const [allAttendances, setAllAttendances] = useState([]);
-    const [employees, setEmployees] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const { data: leaves = [], isLoading: loadingLeaves } = useSWR('/leave/', fetcher, { refreshInterval: 10000 });
+    const { data: attendances = [], isLoading: loadingAttendances } = useSWR('/attendance/pending/', fetcher, { refreshInterval: 10000 });
+    const { data: allAttendances = [], isLoading: loadingAll } = useSWR('/attendance/', fetcher, { refreshInterval: 10000 });
+    const { data: employees = [], isLoading: loadingEmployees } = useSWR('/employees/', fetcher, { refreshInterval: 10000 });
+    
+    const loading = loadingLeaves || loadingAttendances || loadingAll || loadingEmployees;
     const [leaveToday, setLeaveToday] = useState([]);
     const [showLeaveToday, setShowLeaveToday] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -24,55 +26,33 @@ const AttendanceLeaveManagement = () => {
     const [statsMonth, setStatsMonth] = useState(new Date().getMonth());
     const [selectedDepartment, setSelectedDepartment] = useState('');
 
-    useEffect(() => {
-        fetchData();
-        const interval = setInterval(() => {
-            fetchData();
-        }, 10000); // Poll every 10 seconds
-        return () => clearInterval(interval);
-    }, []);
-
-    const fetchData = async () => {
-        try {
-            const leavesRes = await api.get('/leave/');
-            const attendanceRes = await api.get('/attendance/pending/');
-            const allAttendanceRes = await api.get('/attendance/');
-            const employeesRes = await api.get('/employees/');
-            
-            setLeaves(leavesRes.data);
-            setAttendances(attendanceRes.data);
-            setAllAttendances(allAttendanceRes.data);
-            setEmployees(employeesRes.data);
-            
-            const today = new Date().toISOString().split('T')[0];
-            const onLeaveToday = leavesRes.data.filter(l => l.status === 'approved' && l.start_date <= today && l.end_date >= today);
-            const uniqueLeaveToday = Array.from(new Map(onLeaveToday.map(l => [l.employee, l])).values());
-            setLeaveToday(uniqueLeaveToday);
-        } catch (error) {
-            console.error('Error:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    React.useEffect(() => {
+        const today = new Date().toISOString().split('T')[0];
+        const onLeaveToday = leaves.filter(l => l.status === 'approved' && l.start_date <= today && l.end_date >= today);
+        const uniqueLeaveToday = Array.from(new Map(onLeaveToday.map(l => [l.employee, l])).values());
+        setLeaveToday(uniqueLeaveToday);
+    }, [leaves]);
 
     const approveLeave = async (id) => {
         await api.put(`/leave/${id}/approve/`);
-        fetchData();
+        mutate('/leave/');
     };
 
     const rejectLeave = async (id) => {
         await api.put(`/leave/${id}/reject/`);
-        fetchData();
+        mutate('/leave/');
     };
 
     const approveAttendance = async (id) => {
         await api.put(`/attendance/${id}/approve/`);
-        fetchData();
+        mutate('/attendance/pending/');
+        mutate('/attendance/');
     };
 
     const rejectAttendance = async (id) => {
         await api.put(`/attendance/${id}/reject/`);
-        fetchData();
+        mutate('/attendance/pending/');
+        mutate('/attendance/');
     };
 
     const calculateEmployeeStats = (emp, targetYear, targetMonth) => {
