@@ -26,7 +26,6 @@ const PayrollPerformance = () => {
     }, []);
 
     const fetchData = async () => {
-        setLoading(true);
         try {
             const empRes = await api.get('/employees/');
             const payrollRes = await api.get('/payroll/');

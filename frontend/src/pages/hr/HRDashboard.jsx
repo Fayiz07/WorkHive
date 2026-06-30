@@ -30,7 +30,6 @@ const HRDashboard = () => {
     }, []);
 
     const fetchData = async () => {
-        setLoading(true);
         try {
             const empRes = await api.get('/employees/');
             const employeeList = empRes.data;

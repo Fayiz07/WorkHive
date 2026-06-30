@@ -24,7 +24,6 @@ const EmployeeDashboard = () => {
     }, []);
 
     const fetchData = async () => {
-        setLoading(true);
         try {
             const eventsRes = await api.get('/hr-dashboard/events/');
             setEvents(eventsRes.data);
